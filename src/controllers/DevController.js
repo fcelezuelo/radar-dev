@@ -39,5 +39,33 @@ module.exports = {
             console.log(err);
             res.send('error store')
         }
+    },
+
+    async update(req, res) {
+        const { github_username } = req.params;
+
+        const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);
+
+        const { name = login, avatar_url, bio = '' } = apiResponse.data;
+
+        dev = await Dev.findOneAndUpdate(
+            {
+                github_username
+            },
+            {
+                name,
+                avatar_url,
+                bio,
+            })
+
+        return res.json(dev)
+    },
+
+    async destroy(req, res) {
+        const { github_username } = req.params;
+
+        await Dev.deleteOne({ github_username });
+
+        res.send(true);
     }
 };
